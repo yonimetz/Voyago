@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Long> {
     // כאן נוכל להוסיף בעתיד שיטות חיפוש מיוחדות, כמו מציאת משתמש לפי אימייל
     User findByEmail(String email);
+    User findByUsername(String username);
 }

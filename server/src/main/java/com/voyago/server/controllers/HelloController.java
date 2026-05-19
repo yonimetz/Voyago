@@ -1,4 +1,4 @@
-package com.voyago.server;
+package com.voyago.server.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
