@@ -1,5 +1,7 @@
 package com.voyago.server.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,8 +17,13 @@ public class RouteStop {
     private String locationName;
     private String address;
     private String visitTime; // שעת ביקור מתוכננת
+    private String imageKeyword;
 
     @ManyToOne
     @JoinColumn(name = "day_id", nullable = false)
+    @JsonIgnore
     private TripDay tripDay;
+
+    public String getImageKeyword() { return imageKeyword; }
+    public void setImageKeyword(String imageKeyword) { this.imageKeyword = imageKeyword; }
 }

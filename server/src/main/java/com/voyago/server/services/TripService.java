@@ -18,4 +18,14 @@ public class TripService {
     public List<Trip> getTripsByUserId(Long userId) {
         return tripRepository.findByUserId(userId);
     }
+
+    // פונקציה לשליפת טיול בודד לפי מזהה
+    public Trip getTripById(Long id) {
+        return tripRepository.findById(id).orElse(null);
+    }
+
+    // פונקציה למחיקת טיול לפי ID
+    public void deleteTrip(Long id) {
+        tripRepository.deleteById(id);
+    }
 }
