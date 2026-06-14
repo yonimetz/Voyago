@@ -13,6 +13,7 @@ function Dashboard({ currentUser, setCurrentUser }) {
   const [endDate, setEndDate] = useState('');
   const [style, setStyle] = useState('Adventure');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoadingTrips, setIsLoadingTrips] = useState(true);
   const navigate = useNavigate();
   
   const { t, i18n } = useTranslation();
@@ -21,8 +22,9 @@ function Dashboard({ currentUser, setCurrentUser }) {
   };
 
   // שליפת טיולים עבור המשתמש הספציפי
-useEffect(() => {
+  useEffect(() => {
     if (currentUser && currentUser.id) {
+      setIsLoadingTrips(true); // מתחילים טעינה
       axios.get(`http://localhost:8080/api/trips/user/${currentUser.id}`, {
         withCredentials: true 
       })
@@ -30,10 +32,15 @@ useEffect(() => {
             console.log("Trips loaded from server:", res.data);
             setTrips(res.data);
         })
-        .catch(err => console.error('Error fetching trips:', err));
+        .catch(err => console.error('Error fetching trips:', err))
+        .finally(() => {
+            setIsLoadingTrips(false); // מפסיקים טעינה כשהתשובה מגיעה
+        });
+    } else {
+      setIsLoadingTrips(false); // אם אין משתמש (למשל טרם התחבר), נפסיק טעינה
     }
   }, [currentUser]);
-
+  
   // פונקציית התנתקות - מנקה את הסטייט ועוברת לדף הלוגין
   const handleLogout = () => {
     localStorage.removeItem('voyago_user');
@@ -188,8 +195,12 @@ try {
             )}
           </header>
           
-          {/* החלפה דינמית בין טופס היצירה לבין רשימת הטיולים */}
-          {showCreateForm ? (
+{isLoadingTrips ? (
+            <div className="flex flex-col items-center justify-center py-24">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+              <p className="text-slate-500 font-medium">Loading your adventures...</p>
+            </div>
+          ) : showCreateForm ? (
             <div className="bg-white p-8 rounded-[40px] shadow-sm border border-slate-200">
                 <form onSubmit={handleGenerateTrip} className="space-y-6 max-w-2xl mx-auto">
                     <div>

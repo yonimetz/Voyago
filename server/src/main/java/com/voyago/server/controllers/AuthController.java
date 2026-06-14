@@ -38,7 +38,7 @@ public class AuthController {
             
             String token = jwtUtil.generateToken(user.getEmail());
 
-            // HttpOnly Cookie יצירת
+            // יצירת HttpOnly Cookie
             jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("jwt", token);
             cookie.setHttpOnly(true); // חוסם גישת JavaScript לעוגייה ומגן מפני XSS
             cookie.setSecure(false);  // ישונה ל-true כאשר נעבור ל-HTTPS בסביבת פרודקשן
@@ -47,7 +47,15 @@ public class AuthController {
 
             response.addCookie(cookie);
 
-            return ResponseEntity.ok().body("{\"id\":" + user.getId() + ", \"username\":\"" + user.getUsername() + "\", \"email\":\"" + user.getEmail() + "\"}");
+            // הדרך המקצועית והבטוחה להחזיר JSON ב-Spring Boot
+            java.util.Map<String, Object> responseBody = new java.util.HashMap<>();
+            responseBody.put("id", user.getId());
+            responseBody.put("username", user.getUsername());
+            responseBody.put("email", user.getEmail());
+            responseBody.put("aiPreferences", user.getAiPreferences()); // הנה השדה החדש שלנו!
+
+            return ResponseEntity.ok(responseBody);
+            
         } catch (RuntimeException e) {
             return ResponseEntity.status(401).body(e.getMessage());
         }

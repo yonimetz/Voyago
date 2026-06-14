@@ -22,16 +22,40 @@ function Profile({ currentUser, setCurrentUser }) {
 
   // טעינת הנתונים הראשונית: הופך את הטקסט מהשרת למערך
   useEffect(() => {
-    if (currentUser && currentUser.aiPreferences) {
+    console.log("User data from server:", currentUser); // דיבאג: בודק מה באמת הגיע מהשרת
+
+    // מושך את השדה, לא משנה אם השרת שלח אותו ב-CamelCase או באותיות קטנות
+    const prefsFromServer = currentUser?.aiPreferences || currentUser?.ai_preferences || currentUser?.aipreferences;
+
+    if (prefsFromServer) {
       try {
-        // מנסה לקרוא את זה כמערך מובנה
-        const parsedPrefs = JSON.parse(currentUser.aiPreferences);
-        if (Array.isArray(parsedPrefs)) {
-          setPreferencesList(parsedPrefs);
+        // מקרה 1: השרת/Axios כבר הפכו את זה למערך אוטומטית
+        if (Array.isArray(prefsFromServer)) {
+          setPreferencesList(prefsFromServer);
+          return;
+        }
+
+        // מקרה 2: זה טקסט שמתחיל כמו מערך JSON
+        if (typeof prefsFromServer === 'string' && prefsFromServer.trim().startsWith('[')) {
+          const parsedPrefs = JSON.parse(prefsFromServer);
+          if (Array.isArray(parsedPrefs)) {
+            setPreferencesList(parsedPrefs);
+            return;
+          }
+        }
+
+        // מקרה 3 (גיבוי): זה סתם טקסט ישן. ננקה מרכאות מיותרות ונהפוך למערך
+        if (typeof prefsFromServer === 'string') {
+          const cleanText = prefsFromServer.replace(/^"|"$/g, ''); 
+          if (cleanText.includes(',')) {
+            setPreferencesList(cleanText.split(',').map(p => p.trim()).filter(Boolean));
+          } else {
+            setPreferencesList([cleanText]);
+          }
         }
       } catch (e) {
-        // אם זה טקסט רגיל מהגרסה הקודמת (כמו ההערה על בית חב"ד), נהפוך אותו לפריט הראשון במערך
-        setPreferencesList([currentUser.aiPreferences]);
+        console.error("Error parsing preferences:", e);
+        setPreferencesList([prefsFromServer]); // ברירת מחדל אחרונה במקרה של קריסה
       }
     }
   }, [currentUser]);
