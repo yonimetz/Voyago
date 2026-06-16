@@ -23,15 +23,13 @@ public class GeminiService {
         this.objectMapper = new ObjectMapper();
     }
 
+    // הפונקציה הראשית ליצירת טיול שלם
     public String generateTripPlan(String destination, String startDate, String endDate, String style, String aiPreferences, String language) {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + apiKey;
-
         String targetLanguage = (language != null && language.equals("he")) ? "Hebrew" : "English";
 
         String prompt = "Act as a professional travel planner. Generate a detailed trip itinerary for " + destination + 
                         " from " + startDate + " to " + endDate + ". Trip style/preference: " + style + ". ";
                         
-        // הזרקת ההעדפות: אם למשתמש יש העדפות שמורות, אנחנו מוסיפים אותן כהוראת חובה ל-AI
         if (aiPreferences != null && !aiPreferences.trim().isEmpty()) {
             prompt += "CRITICAL USER PREFERENCES: " + aiPreferences + ". You MUST adhere to these rules strictly when planning the itinerary. ";
         }
@@ -49,7 +47,34 @@ public class GeminiService {
                   "\"address\": \"string\", " +
                   "\"image_keyword\": \"Strictly English search term for this specific stop\" } ] } ] }";
 
-        // ניקוי ירידות שורה וגרשיים כדי למנוע קריסת JSON בבקשה
+        // עכשיו פשוט קוראים לפונקציית העזר שלנו!
+        return callGeminiApi(prompt);
+    }
+
+    // הפונקציה החדשה להחלפת תחנה בודדת
+    public String generateAlternativeStop(String destination, String currentStopName, String currentStopDesc, String userPrompt) {
+        String reason = (userPrompt != null && !userPrompt.trim().isEmpty()) 
+                ? userPrompt 
+                : "No specific reason, just suggest a different type of attraction or experience.";
+
+        String prompt = String.format(
+            "You are an expert travel planner. The user is planning a trip to %s. " +
+            "They currently have a stop planned at '%s' (Description: '%s'). They want to change it. " +
+            "User's reason for changing: '%s'. " +
+            "CRITICAL INSTRUCTION: If the user's reason explicitly asks for a different TYPE of activity (e.g., 'no food', 'want a museum', 'tired of walking'), follow their request immediately. " +
+            "However, if their reason is general (like 'too expensive', 'boring', or left empty), try to maintain the original PURPOSE of the stop (e.g., replace a lunch spot with another lunch spot, or a park with another outdoor area). " +
+            "Return ONLY a valid JSON object (no markdown, no code blocks) with exactly these keys: " +
+            "\"location_name\" (string), \"visit_time\" (string - short description of the activity), \"address\" (string), \"image_keyword\" (string - English term for unsplash).",
+            destination, currentStopName, currentStopDesc, reason
+        );
+
+        return callGeminiApi(prompt); 
+    }
+
+    // --- פונקציית העזר הפרטית שמדברת בפועל עם השרתים של גוגל ---
+    private String callGeminiApi(String prompt) {
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + apiKey;
+        
         String safePrompt = prompt.replace("\"", "\\\"").replace("\n", " ");
         String requestBody = "{\n" +
                 "  \"contents\": [{\n" +
@@ -72,8 +97,7 @@ public class GeminiService {
                                            .path("text")
                                            .asText();
 
-            extractedJson = extractedJson.replace("```json", "").replace("```", "").trim();
-            return extractedJson;
+            return extractedJson.replace("```json", "").replace("```", "").trim();
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to communicate with Gemini API: " + e.getMessage());

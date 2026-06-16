@@ -38,4 +38,29 @@ public class RouteStopController {
             return ResponseEntity.status(404).body(Map.of("error", "Stop not found"));
         }
     }
+
+    @PostMapping("/{stopId}/regenerate")
+    public ResponseEntity<?> regenerateStop(@PathVariable Long stopId, @RequestBody Map<String, Object> request) {
+        try {
+            Long tripId = Long.valueOf(request.get("tripId").toString());
+            String userPrompt = (String) request.get("userPrompt");
+
+            RouteStop updatedStop = routeStopService.regenerateStop(stopId, tripId, userPrompt);
+            
+            return ResponseEntity.ok(updatedStop);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    @PutMapping("/{stopId}/restore")
+    public ResponseEntity<?> restoreStop(@PathVariable Long stopId, @RequestBody Map<String, String> request) {
+        try {
+            RouteStop restoredStop = routeStopService.restoreStop(stopId, request);
+            return ResponseEntity.ok(restoredStop);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
 }
