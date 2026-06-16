@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // הסרנו את useRef
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Calendar, ArrowLeft, ArrowRight, Clock, Plus, Edit3, Navigation, Save, X, Wand2, Sparkles } from 'lucide-react';
+// הסרנו את הספרייה react-to-print
+import { MapPin, Calendar, ArrowLeft, ArrowRight, Clock, Plus, Edit3, Navigation, Save, X, Wand2, Sparkles, Printer } from 'lucide-react';
 
 function StopImage({ keyword, stopName, onImageLoad }) {
   const [imageUrl, setImageUrl] = useState(null);
@@ -11,7 +12,6 @@ function StopImage({ keyword, stopName, onImageLoad }) {
   
   useEffect(() => {
     const fetchImage = async () => {
-      // אם ג'מיני לא סיפק מילת חיפוש באנגלית - אל תחפש כלום
       if (!keyword) {
           if(onImageLoad) onImageLoad(false);
           return;
@@ -66,7 +66,6 @@ function StopCard({ stop, stopIndex, trip }) {
                 { withCredentials: true }
             );
             setIsEditing(false);
-            // מעדכנים את ה-State המקומי
             setCurrentStop(prev => ({ ...prev, personalNote: note }));
         } catch (error) {
             console.error("Error saving note:", error);
@@ -76,11 +75,10 @@ function StopCard({ stop, stopIndex, trip }) {
         }
     };
 
-    // הפונקציה האמיתית שמדברת עם ג'מיני ושומרת את המקור!
     const handleRegenerate = async () => {
         setIsRegenerating(true);
         setShowAIPrompt(false);
-        setOriginalStop(currentStop); // שומרים מצב קודם לטובת אפשרות ביטול
+        setOriginalStop(currentStop); 
         
         try {
             const response = await axios.post(
@@ -92,10 +90,9 @@ function StopCard({ stop, stopIndex, trip }) {
                 { withCredentials: true }
             );
             
-            // ג'מיני חזר עם תחנה חדשה!
             setCurrentStop(response.data);
             setAiPrompt('');
-            setIsPreview(true); // מפעילים מצב תצוגה מקדימה ירוק
+            setIsPreview(true);
             
         } catch (error) {
             console.error("Error regenerating stop:", error);
@@ -105,13 +102,11 @@ function StopCard({ stop, stopIndex, trip }) {
         }
     };
 
-    // אם המשתמש אהב את ההצעה
     const handleKeep = () => {
         setIsPreview(false);
         setOriginalStop(null);
     };
 
-    // אם המשתמש מתחרט ורוצה לחזור לתחנה המקורית (Undo)
     const handleRevert = async () => {
         setIsReverting(true);
         try {
@@ -157,10 +152,10 @@ function StopCard({ stop, stopIndex, trip }) {
     }
 
     return (
-      <div className="relative ps-6 md:ps-10 group">
-        <span className={`absolute -start-[11px] top-12 w-5 h-5 rounded-full border-4 border-white shadow-sm transition-transform group-hover:scale-125 ${isPreview ? 'bg-green-500' : 'bg-blue-500'}`}></span>
+      <div className="relative ps-6 md:ps-10 group print:break-inside-avoid">
+        <span className={`absolute -start-[11px] top-12 w-5 h-5 rounded-full border-4 border-white shadow-sm transition-transform group-hover:scale-125 ${isPreview ? 'bg-green-500' : 'bg-blue-500'} print:border-slate-300 print:shadow-none`}></span>
         
-        <div className={`bg-white rounded-[2rem] p-4 shadow-sm border transition-shadow flex flex-col md:flex-row gap-6 ${isPreview ? 'border-green-200 ring-2 ring-green-50' : 'border-slate-100 hover:shadow-xl'}`}>
+        <div className={`bg-white rounded-[2rem] p-4 shadow-sm border transition-shadow flex flex-col md:flex-row gap-6 print:border-slate-300 print:shadow-none ${isPreview ? 'border-green-200 ring-2 ring-green-50' : 'border-slate-100 hover:shadow-xl'}`}>
           
           {hasImage && (
               <div className="w-full md:w-2/5 h-48 md:h-auto rounded-3xl overflow-hidden relative shrink-0 bg-slate-50">
@@ -180,11 +175,11 @@ function StopCard({ stop, stopIndex, trip }) {
               <div className="flex items-start justify-between gap-4 mb-2">
                  <div className="flex items-center gap-3">
                      {!hasImage && (
-                         <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-black shrink-0 ${isPreview ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                         <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-black shrink-0 ${isPreview ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'} print:bg-slate-100 print:text-slate-800`}>
                              {stopIndex + 1}
                          </span>
                      )}
-                     <h3 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                     <h3 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors print:text-black">
                         {currentStop.locationName || currentStop.stopName}
                      </h3>
                  </div>
@@ -192,7 +187,7 @@ function StopCard({ stop, stopIndex, trip }) {
                  {!isPreview && (
                      <button 
                         onClick={() => setShowAIPrompt(!showAIPrompt)}
-                        className="p-2 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0"
+                        className="p-2 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0 print:hidden"
                         title="Change this stop with AI"
                      >
                         <Wand2 className="w-5 h-5" />
@@ -201,18 +196,18 @@ function StopCard({ stop, stopIndex, trip }) {
               </div>
               
               {currentStop.address && (
-                <p className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-blue-500" /> {currentStop.address}
+                <p className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-1.5 print:text-slate-600">
+                  <MapPin className="w-4 h-4 text-blue-500 print:text-slate-400" /> {currentStop.address}
                 </p>
               )}
               
-              <p className="text-slate-600 leading-relaxed text-sm mb-4">
+              <p className="text-slate-600 leading-relaxed text-sm mb-4 print:text-black">
                 {currentStop.visitTime || currentStop.description}
               </p>
             </div>
 
             {isPreview ? (
-                <div className="mt-2 p-4 bg-green-50 border border-green-200 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-in shadow-inner">
+                <div className="mt-2 p-4 bg-green-50 border border-green-200 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-in shadow-inner print:hidden">
                     <div className="flex items-center gap-2 text-green-800 font-bold text-sm">
                         <Sparkles className="w-5 h-5 text-green-600" /> 
                         How does this alternative look?
@@ -229,7 +224,7 @@ function StopCard({ stop, stopIndex, trip }) {
             ) : (
                 <>
                     {showAIPrompt && (
-                        <div className="mb-4 p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 animate-fade-in shadow-inner">
+                        <div className="mb-4 p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 animate-fade-in shadow-inner print:hidden">
                             <div className="flex items-center gap-2 mb-2 text-indigo-800 font-bold text-sm">
                                 <Sparkles className="w-4 h-4" /> Want to change this stop?
                             </div>
@@ -258,9 +253,9 @@ function StopCard({ stop, stopIndex, trip }) {
                         </div>
                     )}
 
-                    <div className="mt-auto pt-4 border-t border-slate-100/50">
+                    <div className="mt-auto pt-4 border-t border-slate-100/50 print:pt-2 print:border-none">
                       {isEditing ? (
-                        <div className="bg-blue-50/50 p-3 rounded-2xl border border-blue-100 animate-fade-in">
+                        <div className="bg-blue-50/50 p-3 rounded-2xl border border-blue-100 animate-fade-in print:hidden">
                           <textarea
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
@@ -292,17 +287,20 @@ function StopCard({ stop, stopIndex, trip }) {
                       ) : note ? (
                         <div 
                           onClick={() => setIsEditing(true)}
-                          className="bg-amber-50 p-3 rounded-2xl border border-amber-100 cursor-pointer hover:bg-amber-100 transition-colors group/note relative"
+                          className="bg-amber-50 p-3 rounded-2xl border border-amber-100 cursor-pointer hover:bg-amber-100 transition-colors group/note relative print:bg-transparent print:border-none print:p-0"
                         >
                           <div className="flex items-start gap-2">
-                            <Edit3 className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                            <p className="text-slate-700 text-sm whitespace-pre-wrap">{note}</p>
+                            <Edit3 className="w-4 h-4 text-amber-500 shrink-0 mt-0.5 print:hidden" />
+                            <p className="text-slate-700 text-sm whitespace-pre-wrap print:text-black">
+                              <span className="hidden print:inline font-bold">Note: </span>
+                              {note}
+                            </p>
                           </div>
                         </div>
                       ) : (
                         <div 
                           onClick={() => setIsEditing(true)}
-                          className="bg-slate-50 p-3 rounded-2xl border border-slate-100 cursor-pointer hover:bg-blue-50/50 hover:border-blue-100 transition-colors group/add"
+                          className="bg-slate-50 p-3 rounded-2xl border border-slate-100 cursor-pointer hover:bg-blue-50/50 hover:border-blue-100 transition-colors group/add print:hidden"
                         >
                           <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover/add:text-blue-600">
                             <Plus className="w-4 h-4 bg-slate-200 text-slate-600 rounded-full p-0.5 group-hover/add:bg-blue-200 group-hover/add:text-blue-700 transition-colors" />
@@ -320,8 +318,7 @@ function StopCard({ stop, stopIndex, trip }) {
     );
 }
 
-// קומפוננטת האב הראשי
-function TripView() {
+function TripView() { 
   const { tripId } = useParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -364,10 +361,11 @@ function TripView() {
 
   if (!trip) return <div className="text-center py-20 text-slate-500">Trip not found.</div>;
 
-  return (
+ return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20 scroll-smooth">
       
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+      {/* סרגל עליון */}
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm print:hidden">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <button 
             onClick={() => navigate(-1)}
@@ -376,87 +374,105 @@ function TripView() {
             {isRTL ? <ArrowRight className="w-5 h-5 me-2" /> : <ArrowLeft className="w-5 h-5 me-2" />}
             Back
           </button>
-          <h1 className="text-xl font-black text-slate-800 tracking-tight">Voyago<span className="text-blue-600">.</span></h1>
-        </div>
-      </div>
-
-      <div className="relative h-[35vh] min-h-[300px] w-full">
-        <img 
-          src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1920&q=80" 
-          alt="Trip Cover" 
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
-
-        <div className="absolute bottom-0 start-0 p-8 w-full max-w-7xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-2 drop-shadow-lg">
-            {trip.destination}
+          
+          <h1 className="text-xl font-black text-slate-800 tracking-tight absolute left-1/2 -translate-x-1/2">
+            Voyago<span className="text-blue-600">.</span>
           </h1>
-          <div className="flex items-center gap-2 text-blue-200 font-medium text-lg drop-shadow-md">
-            <Calendar className="w-5 h-5" />
-            <span>{trip.startDate} — {trip.endDate}</span>
-          </div>
+
+          <div className="w-20"></div> 
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col lg:flex-row gap-12">
+      <div className="print:bg-white print:pb-0">
         
-        <aside className="lg:w-1/4">
-          <div className="sticky top-24 bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-            <h3 className="font-bold text-slate-800 mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
-              <Navigation className="w-4 h-4 text-indigo-500" />
-              Trip Itinerary
-            </h3>
-            
-            <div className="flex flex-col gap-2">
-              {trip.days?.sort((a, b) => a.dayNumber - b.dayNumber).map((day) => (
-                <button
-                  key={day.id}
-                  onClick={() => scrollToDay(day.dayNumber)}
-                  className={`text-start px-5 py-4 rounded-2xl font-bold transition-all ${
-                    activeDay === day.dayNumber 
-                      ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
-                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
-                  }`}
-                >
-                  Day {day.dayNumber}
-                  <span className="block text-xs font-normal text-slate-400 mt-1 truncate">
-                    {day.date || day.description}
-                  </span>
-                </button>
-              ))}
+        <div className="relative h-[35vh] min-h-[300px] w-full print:h-[250px] print:min-h-[250px]">
+          <img 
+            src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1920&q=80" 
+            alt="Trip Cover" 
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent print:from-slate-900/70"></div>
+
+          <div className="absolute bottom-0 start-0 p-8 w-full max-w-7xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-2 drop-shadow-lg">
+              {trip.destination}
+            </h1>
+            <div className="flex items-center gap-2 text-blue-200 font-medium text-lg drop-shadow-md">
+              <Calendar className="w-5 h-5" />
+              <span>{trip.startDate} — {trip.endDate}</span>
             </div>
           </div>
-        </aside>
+        </div>
 
-        <main className="lg:w-3/4">
-          <div className="space-y-16 relative">
-            
-            {trip.days?.sort((a, b) => a.dayNumber - b.dayNumber).map((day) => (
-              <div key={day.id} id={`day-${day.dayNumber}`} className="scroll-mt-24">
+        <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col lg:flex-row gap-12 print:py-8 print:gap-0">
+          
+          {/* תפריט צד */}
+          <aside className="lg:w-1/4 print:hidden">
+            <div className="sticky top-24 bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+              
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-50">
+                <h3 className="font-bold text-slate-800 uppercase tracking-wider text-sm flex items-center gap-2">
+                  <Navigation className="w-4 h-4 text-indigo-500" />
+                  Trip Itinerary
+                </h3>
                 
-                <div className="mb-8 pb-4 border-b-2 border-slate-100">
-                  <h2 className="text-3xl font-black text-blue-600 flex items-center gap-2">
-                    {day.date ? (
-                      <>Day {day.dayNumber} <span className="text-blue-400 font-bold text-2xl">- {day.date}</span></>
-                    ) : (
-                      <>{day.description}</>
-                    )}
-                  </h2>
-                </div>
-
-                <div className="relative border-s-2 border-blue-100 ms-4 md:ms-6 space-y-8 pb-4">
-                  {day.stops?.map((stop, stopIndex) => (
-                    // הקריאה לקומפוננטה כאן קצרה ונקייה!
-                    <StopCard key={stop.id} stop={stop} stopIndex={stopIndex} trip={trip} />
-                  ))}
-                </div>
-
+                {/* קריאה ישירה לדפדפן להדפיס! */}
+                <button 
+                  onClick={() => window.print()} 
+                  className="flex items-center justify-center p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:scale-105 rounded-xl transition-all"
+                  title="Export to PDF"
+                >
+                  <Printer className="w-4 h-4" />
+                </button>
               </div>
-            ))}
-          </div>
-        </main>
+              
+              <div className="flex flex-col gap-2">
+                {trip.days?.sort((a, b) => a.dayNumber - b.dayNumber).map((day) => (
+                  <button
+                    key={day.id}
+                    onClick={() => scrollToDay(day.dayNumber)}
+                    className={`text-start px-5 py-4 rounded-2xl font-bold transition-all ${
+                      activeDay === day.dayNumber 
+                        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100' 
+                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
+                    }`}
+                  >
+                    Day {day.dayNumber}
+                    <span className="block text-xs font-normal text-slate-400 mt-1 truncate">
+                      {day.date || day.description}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
 
+          {/* המסלול ברוחב מלא בהדפסה */}
+          <main className="lg:w-3/4 print:w-full">
+            <div className="space-y-16 relative print:space-y-10">
+              
+              {trip.days?.sort((a, b) => a.dayNumber - b.dayNumber).map((day) => (
+                <div key={day.id} id={`day-${day.dayNumber}`} className="scroll-mt-24 print:break-inside-avoid">
+                  
+                  <div className="mb-8 pb-4 border-b-2 border-slate-100 print:mb-6">
+                    <h2 className="text-3xl font-black text-blue-600 flex items-center gap-2">
+                      {day.date ? (
+                        <>Day {day.dayNumber} <span className="text-blue-400 font-bold text-2xl">- {day.date}</span></>
+                      ) : (
+                        <>{day.description}</>
+                      )}
+                    </h2>
+                  </div>
+                  <div className="relative border-s-2 border-blue-100 ms-4 md:ms-6 space-y-8 pb-4 print:space-y-6 print:border-s-0 print:ms-0">
+                    {day.stops?.map((stop, stopIndex) => (
+                      <StopCard key={stop.id} stop={stop} stopIndex={stopIndex} trip={trip} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
