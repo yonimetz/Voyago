@@ -63,4 +63,16 @@ public class RouteStopController {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PutMapping("/{stopId}/document")
+    public ResponseEntity<?> updateDocument(@PathVariable Long stopId, @RequestBody Map<String, String> request) {
+        try {
+            String url = request.get("documentUrl");
+            String name = request.get("documentName");
+            RouteStop updatedStop = routeStopService.updateDocument(stopId, url, name);
+            return ResponseEntity.ok(updatedStop);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
 }

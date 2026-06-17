@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'; // הסרנו את useRef
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-// הסרנו את הספרייה react-to-print
-import { MapPin, Calendar, ArrowLeft, ArrowRight, Clock, Plus, Edit3, Navigation, Save, X, Wand2, Sparkles, Printer } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
+import { MapPin, Calendar, ArrowLeft, ArrowRight, Clock, Plus, Edit3, Navigation, Save, X, Wand2, Sparkles, Printer, Paperclip, FileText, Loader2 } from 'lucide-react';
 
 function StopImage({ keyword, stopName, onImageLoad }) {
   const [imageUrl, setImageUrl] = useState(null);
@@ -56,6 +56,11 @@ function StopCard({ stop, stopIndex, trip }) {
     const [isRegenerating, setIsRegenerating] = useState(false);
     const [showAIPrompt, setShowAIPrompt] = useState(false);
     const [aiPrompt, setAiPrompt] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef(null);
+
+    const CLOUDINARY_CLOUD_NAME = "dz6lohc2f";
+    const CLOUDINARY_UPLOAD_PRESET = "voyago_docs";
 
     const handleSaveNote = async () => {
       try {
@@ -69,7 +74,7 @@ function StopCard({ stop, stopIndex, trip }) {
             setCurrentStop(prev => ({ ...prev, personalNote: note }));
         } catch (error) {
             console.error("Error saving note:", error);
-            alert("Failed to save note. Please try again.");
+            toast.error("Failed to save note. Please try again.");
         } finally {
             setIsSaving(false);
         }
@@ -95,9 +100,22 @@ function StopCard({ stop, stopIndex, trip }) {
             setIsPreview(true);
             
         } catch (error) {
-            console.error("Error regenerating stop:", error);
-            alert("Oops! Gemini had a hiccup. Please try again.");
-        } finally {
+    console.error("Error regenerating stop:", error);
+    
+    const errorMessage = error.response?.data?.error || "";
+    
+    if (errorMessage.includes("503") || errorMessage.toLowerCase().includes("demand") || errorMessage.toLowerCase().includes("unavailable")) {
+        toast('The AI service is currently experiencing high demand. Please try again in a moment.', {
+            style: {
+              borderRadius: '10px',
+              background: '#333',
+              color: '#fff',
+            },
+        });
+    } else {
+        toast.error("Oops! Something went wrong communicating with the AI.");
+    }
+} finally {
             setIsRegenerating(false); 
         }
     };
@@ -122,9 +140,65 @@ function StopCard({ stop, stopIndex, trip }) {
             setOriginalStop(null);
         } catch (error) {
             console.error("Error restoring:", error);
-            alert("Failed to revert. Please refresh the page.");
+            toast.error("Failed to revert. Please refresh the page.");
         } finally {
             setIsReverting(false);
+        }
+    };
+
+    const handleFileUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+        try {
+            const cloudinaryRes = await axios.post(
+                `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`,
+                formData,
+                { 
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    withCredentials: false 
+                }
+            );
+            
+            const fileUrl = cloudinaryRes.data.secure_url;
+            const fileName = file.name;
+
+            await axios.put(
+                `http://localhost:8080/api/stops/${currentStop.id}/document`,
+                { documentUrl: fileUrl, documentName: fileName },
+                { withCredentials: true }
+            );
+
+            setCurrentStop(prev => ({ ...prev, attachedDocumentUrl: fileUrl, attachedDocumentName: fileName }));
+            
+        } catch (error) {
+            console.error("Upload failed", error);
+            toast.error("Failed to upload document. Please try again.");
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
+
+    const handleRemoveDocument = async () => {
+        if (!window.confirm("Are you sure you want to remove this document?")) return;
+        
+        try {
+            await axios.put(
+                `http://localhost:8080/api/stops/${currentStop.id}/document`,
+                { documentUrl: "", documentName: "" },
+                { withCredentials: true }
+            );
+            
+            setCurrentStop(prev => ({ ...prev, attachedDocumentUrl: "", attachedDocumentName: "" }));
+        } catch (error) {
+            console.error("Failed to remove document", error);
+            toast.error("Failed to remove document.");
         }
     };
 
@@ -187,7 +261,7 @@ function StopCard({ stop, stopIndex, trip }) {
                  {!isPreview && (
                      <button 
                         onClick={() => setShowAIPrompt(!showAIPrompt)}
-                        className="p-2 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0 print:hidden"
+                        className="p-2 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors shrink-0 print:hidden"
                         title="Change this stop with AI"
                      >
                         <Wand2 className="w-5 h-5" />
@@ -253,6 +327,48 @@ function StopCard({ stop, stopIndex, trip }) {
                         </div>
                     )}
 
+                    <div className="mt-2 mb-4 print:hidden">
+                      <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          onChange={handleFileUpload} 
+                          className="hidden" 
+                          accept="image/*,.pdf" 
+                      />
+                      
+                      {isUploading ? (
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-500 rounded-lg text-xs font-bold animate-pulse">
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading securely...
+                          </div>
+                      ) : currentStop.attachedDocumentUrl ? (
+                          <div className="inline-flex items-center gap-2">
+                            <a 
+                                href={currentStop.attachedDocumentUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                            >
+                                <FileText className="w-3.5 h-3.5" /> 
+                                <span className="truncate max-w-[150px]">{currentStop.attachedDocumentName || "View Document"}</span>
+                            </a>
+                            <button 
+                                onClick={handleRemoveDocument}
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Remove document"
+                            >
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                      ) : (
+                          <button 
+                              onClick={() => fileInputRef.current.click()}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg text-xs font-bold transition-colors"
+                          >
+                              <Paperclip className="w-3.5 h-3.5" /> Attach Ticket / PDF
+                          </button>
+                      )}
+                    </div>
+
                     <div className="mt-auto pt-4 border-t border-slate-100/50 print:pt-2 print:border-none">
                       {isEditing ? (
                         <div className="bg-blue-50/50 p-3 rounded-2xl border border-blue-100 animate-fade-in print:hidden">
@@ -300,10 +416,10 @@ function StopCard({ stop, stopIndex, trip }) {
                       ) : (
                         <div 
                           onClick={() => setIsEditing(true)}
-                          className="bg-slate-50 p-3 rounded-2xl border border-slate-100 cursor-pointer hover:bg-blue-50/50 hover:border-blue-100 transition-colors group/add print:hidden"
+                          className="bg-slate-50 p-3 rounded-2xl border border-slate-100 cursor-pointer hover:bg-blue-50/50 hover:border-blue-100 transition-colors print:hidden"
                         >
-                          <div className="flex items-center gap-2 text-slate-400 font-medium text-sm group-hover/add:text-blue-600">
-                            <Plus className="w-4 h-4 bg-slate-200 text-slate-600 rounded-full p-0.5 group-hover/add:bg-blue-200 group-hover/add:text-blue-700 transition-colors" />
+                          <div className="flex items-center gap-2 text-slate-400 font-medium text-sm hover:text-blue-600">
+                            <Plus className="w-4 h-4 bg-slate-200 text-slate-600 rounded-full p-0.5 hover:bg-blue-200 hover:text-blue-700 transition-colors" />
                             Add a personal note for this stop...
                           </div>
                         </div>
@@ -362,8 +478,9 @@ function TripView() {
   if (!trip) return <div className="text-center py-20 text-slate-500">Trip not found.</div>;
 
  return (
+  
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20 scroll-smooth">
-      
+      <Toaster position="bottom-center" reverseOrder={false} />
       {/* סרגל עליון */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm print:hidden">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
