@@ -52,7 +52,7 @@ public class AuthController {
             responseBody.put("id", user.getId());
             responseBody.put("username", user.getUsername());
             responseBody.put("email", user.getEmail());
-            responseBody.put("aiPreferences", user.getAiPreferences()); // הנה השדה החדש שלנו!
+            responseBody.put("aiPreferences", user.getAiPreferences());
 
             return ResponseEntity.ok(responseBody);
             

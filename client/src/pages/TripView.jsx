@@ -105,7 +105,7 @@ function StopCard({ stop, stopIndex, trip }) {
     const errorMessage = error.response?.data?.error || "";
     
     if (errorMessage.includes("503") || errorMessage.toLowerCase().includes("demand") || errorMessage.toLowerCase().includes("unavailable")) {
-        toast('The AI service is currently experiencing high demand. Please try again in a moment.', {
+        toast('The AI service is experiencing extremely high demand right now. Please wait a minute and try clicking Generate again!', {
             style: {
               borderRadius: '10px',
               background: '#333',
@@ -113,7 +113,7 @@ function StopCard({ stop, stopIndex, trip }) {
             },
         });
     } else {
-        toast.error("Oops! Something went wrong communicating with the AI.");
+        toast.error("Failed to generate your trip. Please try again.");
     }
 } finally {
             setIsRegenerating(false); 
