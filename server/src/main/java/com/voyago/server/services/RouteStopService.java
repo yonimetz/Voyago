@@ -85,4 +85,14 @@ public class RouteStopService {
         
         return routeStopRepository.save(stop);
     }
+
+    public RouteStop updateDocument(Long stopId, String documentUrl, String documentName) {
+        RouteStop stop = routeStopRepository.findById(stopId)
+                .orElseThrow(() -> new RuntimeException("Stop not found"));
+        
+        stop.setAttachedDocumentUrl(documentUrl);
+        stop.setAttachedDocumentName(documentName);
+        
+        return routeStopRepository.save(stop);
+    }
 }

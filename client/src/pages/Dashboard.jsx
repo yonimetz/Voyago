@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import TripCard from '../components/TripCard';
 import { useTranslation } from 'react-i18next';
+import toast, { Toaster } from 'react-hot-toast';
 import {Users } from 'lucide-react';
 
 function Dashboard({ currentUser, setCurrentUser }) {
@@ -21,10 +22,10 @@ function Dashboard({ currentUser, setCurrentUser }) {
     i18n.changeLanguage(i18n.language === 'en' ? 'he' : 'en');
   };
 
-  // שליפת טיולים עבור המשתמש הספציפי
+  // שליפת טיולים
   useEffect(() => {
     if (currentUser && currentUser.id) {
-      setIsLoadingTrips(true); // מתחילים טעינה
+      setIsLoadingTrips(true);
       axios.get(`http://localhost:8080/api/trips/user/${currentUser.id}`, {
         withCredentials: true 
       })
@@ -34,17 +35,15 @@ function Dashboard({ currentUser, setCurrentUser }) {
         })
         .catch(err => console.error('Error fetching trips:', err))
         .finally(() => {
-            setIsLoadingTrips(false); // מפסיקים טעינה כשהתשובה מגיעה
+            setIsLoadingTrips(false);
         });
     } else {
-      setIsLoadingTrips(false); // אם אין משתמש (למשל טרם התחבר), נפסיק טעינה
+      setIsLoadingTrips(false);
     }
   }, [currentUser]);
   
-  // פונקציית התנתקות - מנקה את הסטייט ועוברת לדף הלוגין
   const handleLogout = () => {
     localStorage.removeItem('voyago_user');
-    //localStorage.removeItem('voyago_token');
     setCurrentUser(null);
     navigate('/login');
   };
@@ -62,16 +61,15 @@ function Dashboard({ currentUser, setCurrentUser }) {
         language: i18n.language
     };
 
-try {
+    try {
         console.log("Sending request to AI engine...", requestData);
         const response = await axios.post('http://localhost:8080/api/trips/generate', requestData, {
             withCredentials: true // חשוב כדי שה-JWT יעבור
         });
         
         console.log("Trip saved successfully to DB!", response.data);
-        alert("הטיול נוצר ונשמר בהצלחה!");
+        toast.error("הטיול נוצר ונשמר בהצלחה!");
         
-        // מוסיף את הטיול החדש לרשימה במסך בלי לרענן את העמוד!
         setTrips(prevTrips => [...prevTrips, response.data]);
         
         setShowCreateForm(false);
@@ -80,28 +78,32 @@ try {
         setEndDate('');
         
     } catch (error) {
-        console.error("Failed to generate trip with AI:", error);
-        alert("שגיאה ביצירת הטיול: " + (error.response?.data?.error || error.message));
+    console.error("Error generating trip:", error);
+    
+    const errorMessage = error.response?.data?.error || "";
+    
+    if (errorMessage.includes("503") || errorMessage.toLowerCase().includes("demand") || errorMessage.toLowerCase().includes("unavailable")) {
+        toast.error("The AI service is experiencing extremely high demand right now. Please wait a minute and try clicking Generate again!");
+    } else {
+        toast.error("Failed to generate your trip. Please try again.");
+    }
     } finally {
         setIsGenerating(false);
-    }
-  };
+      }
+    };
 
-  // פונקציה למחיקת טיול
   const handleDeleteTrip = async (tripId) => {
-    // נוודא שהמשתמש באמת רוצה למחוק כדי למנוע לחיצות בטעות
     if (window.confirm("Are you sure you want to delete this trip?")) {
       try {
         await axios.delete(`http://localhost:8080/api/trips/${tripId}`, {
           withCredentials: true 
         });
         
-        // מעדכן את המסך מיד: מסנן החוצה את הטיול שנמחק בלי לרענן את העמוד
         setTrips(prevTrips => prevTrips.filter(trip => trip.id !== tripId));
         
       } catch (error) {
         console.error("Error deleting trip:", error);
-        alert("Failed to delete the trip. Please try again.");
+        toast.error("Failed to delete the trip. Please try again.");
       }
     }
   };

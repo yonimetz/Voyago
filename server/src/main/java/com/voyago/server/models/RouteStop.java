@@ -22,6 +22,12 @@ public class RouteStop {
     @Column(columnDefinition = "TEXT")
     private String personalNote;
 
+    @Column(name = "attached_document_url")
+    private String attachedDocumentUrl;
+
+    @Column(name = "attached_document_name")
+    private String attachedDocumentName;
+
     @ManyToOne
     @JoinColumn(name = "day_id", nullable = false)
     @JsonIgnore
@@ -37,5 +43,21 @@ public class RouteStop {
 
     public void setPersonalNote(String personalNote) {
         this.personalNote = personalNote;
+    }
+
+    public String getAttachedDocumentUrl() {
+        return attachedDocumentUrl;
+    }
+
+    public void setAttachedDocumentUrl(String attachedDocumentUrl) {
+        this.attachedDocumentUrl = attachedDocumentUrl;
+    }
+
+    public String getAttachedDocumentName() {
+        return attachedDocumentName;
+    }
+
+    public void setAttachedDocumentName(String attachedDocumentName) {
+        this.attachedDocumentName = attachedDocumentName;
     }
 }
