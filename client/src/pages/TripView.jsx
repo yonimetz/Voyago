@@ -100,25 +100,25 @@ function StopCard({ stop, stopIndex, trip }) {
             setIsPreview(true);
             
         } catch (error) {
-    console.error("Error regenerating stop:", error);
+          console.error("Error regenerating stop:", error);
     
-    const errorMessage = error.response?.data?.error || "";
+            const errorMessage = error.response?.data?.error || "";
     
-    if (errorMessage.includes("503") || errorMessage.toLowerCase().includes("demand") || errorMessage.toLowerCase().includes("unavailable")) {
-        toast('The AI service is experiencing extremely high demand right now. Please wait a minute and try clicking Generate again!', {
-            style: {
-              borderRadius: '10px',
-              background: '#333',
-              color: '#fff',
-            },
-        });
-    } else {
-        toast.error("Failed to generate your trip. Please try again.");
-    }
-} finally {
-            setIsRegenerating(false); 
-        }
-    };
+            if (errorMessage.includes("503") || errorMessage.toLowerCase().includes("demand") || errorMessage.toLowerCase().includes("unavailable")) {
+              toast('The AI service is currently experiencing high demand. Please wait a minute and try clicking Regenerate again!', {
+                  style: {
+                    borderRadius: '10px',
+                    background: '#333',
+                    color: '#fff',
+                  },
+              });
+          } else {
+              toast.error("Oops! Something went wrong communicating with the AI. Please try again.");
+          }
+      } finally {
+                  setIsRegenerating(false); 
+          }
+      };
 
     const handleKeep = () => {
         setIsPreview(false);

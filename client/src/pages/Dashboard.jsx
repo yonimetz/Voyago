@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import TripCard from '../components/TripCard';
 import { useTranslation } from 'react-i18next';
 import toast, { Toaster } from 'react-hot-toast';
-import {Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 function Dashboard({ currentUser, setCurrentUser }) {
   const [trips, setTrips] = useState([]);
@@ -48,6 +48,7 @@ function Dashboard({ currentUser, setCurrentUser }) {
     navigate('/login');
   };
 
+  // פונקציית היצירה המתוקנת (בלי כפילויות!)
   const handleGenerateTrip = async (e) => {
     e.preventDefault();
     setIsGenerating(true);
@@ -64,11 +65,11 @@ function Dashboard({ currentUser, setCurrentUser }) {
     try {
         console.log("Sending request to AI engine...", requestData);
         const response = await axios.post('http://localhost:8080/api/trips/generate', requestData, {
-            withCredentials: true // חשוב כדי שה-JWT יעבור
+            withCredentials: true 
         });
         
         console.log("Trip saved successfully to DB!", response.data);
-        toast.error("הטיול נוצר ונשמר בהצלחה!");
+        toast.success("הטיול נוצר ונשמר בהצלחה!");
         
         setTrips(prevTrips => [...prevTrips, response.data]);
         
@@ -78,19 +79,27 @@ function Dashboard({ currentUser, setCurrentUser }) {
         setEndDate('');
         
     } catch (error) {
-    console.error("Error generating trip:", error);
-    
-    const errorMessage = error.response?.data?.error || "";
-    
-    if (errorMessage.includes("503") || errorMessage.toLowerCase().includes("demand") || errorMessage.toLowerCase().includes("unavailable")) {
-        toast.error("The AI service is experiencing extremely high demand right now. Please wait a minute and try clicking Generate again!");
-    } else {
-        toast.error("Failed to generate your trip. Please try again.");
-    }
+        console.error("Error generating trip:", error);
+        
+        // הופכים את כל השגיאה לטקסט כדי לתפוס גם שגיאות 500 שמכילות 503 בפנים
+        const fullErrorText = JSON.stringify(error.response?.data || error.message).toLowerCase();
+        
+        if (fullErrorText.includes("503") || fullErrorText.includes("demand") || fullErrorText.includes("unavailable")) {
+            toast('The AI service is experiencing extremely high demand right now. Please wait a minute and try clicking Generate again!', {
+                icon: '🤖',
+                style: {
+                  borderRadius: '10px',
+                  background: '#333',
+                  color: '#fff',
+                },
+            });
+        } else {
+            toast.error("Failed to generate your trip. Please try again.");
+        }
     } finally {
         setIsGenerating(false);
-      }
-    };
+    }
+  };
 
   const handleDeleteTrip = async (tripId) => {
     if (window.confirm("Are you sure you want to delete this trip?")) {
@@ -100,6 +109,7 @@ function Dashboard({ currentUser, setCurrentUser }) {
         });
         
         setTrips(prevTrips => prevTrips.filter(trip => trip.id !== tripId));
+        toast.success("הטיול נמחק בהצלחה!");
         
       } catch (error) {
         console.error("Error deleting trip:", error);
@@ -111,6 +121,9 @@ function Dashboard({ currentUser, setCurrentUser }) {
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900">
       
+      {/* הוספנו את הטוסטר כאן כדי שיקפיץ הודעות במסך הזה! */}
+      <Toaster position="bottom-center" />
+
       {/* סרגל צד */}
       <aside className="w-72 bg-white border-r border-slate-200 flex flex-col">
         <div className="p-6 border-b border-slate-100">
@@ -197,7 +210,7 @@ function Dashboard({ currentUser, setCurrentUser }) {
             )}
           </header>
           
-{isLoadingTrips ? (
+          {isLoadingTrips ? (
             <div className="flex flex-col items-center justify-center py-24">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
               <p className="text-slate-500 font-medium">Loading your adventures...</p>
