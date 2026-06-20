@@ -8,14 +8,34 @@ function TripCard({ trip, onDelete }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  
+  const getTripStatus = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const startDate = new Date(trip.startDate);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const endDate = new Date(trip.endDate);
+    endDate.setHours(0, 0, 0, 0);
+
+    if (endDate < today) {
+      return { label: t('completed'), textColor: 'text-slate-500' }; 
+    } else if (startDate <= today && endDate >= today) {
+      return { label: t('in_progress'), textColor: 'text-green-600' }; 
+    } else {
+      return { label: t('upcoming'), textColor: 'text-blue-600' };
+    }
+  };
+
+  const status = getTripStatus();
+
   useEffect(() => {
-    // משיכת תמונה מ-Unsplash לפי שם היעד
     const fetchImage = async () => {
       try {
         const searchTerm = trip.imageKeyword || trip.destination;
         const searchQuery = encodeURIComponent(`${searchTerm} travel landscape famous landmark`);
         const accessKey = 'rILzD5qgSzoPenbcXcgldZqVqac3UbXNz9RiUQ9C4Xw';
-        // הוספנו את המילה landmark כדי לקבל תמונות נוף/אתרים ולא סתם אנשים
         const response = await axios.get(
           `https://api.unsplash.com/search/photos?query=${searchQuery}&client_id=${accessKey}&per_page=1&orientation=landscape&order_by=relevant`,
           {
@@ -43,7 +63,7 @@ function TripCard({ trip, onDelete }) {
       <div className="h-48 bg-slate-200 flex items-center justify-center relative overflow-hidden">
         <button
           onClick={(e) => {
-            e.stopPropagation(); // מונע את המעבר לעמוד ה-TripView
+            e.stopPropagation(); 
             onDelete(trip.id);
           }}
           className="absolute top-4 left-4 bg-white/90 hover:bg-red-50 text-slate-400 hover:text-red-500 backdrop-blur-sm w-8 h-8 rounded-full flex items-center justify-center z-20 shadow-sm transition-all duration-300"
@@ -67,9 +87,9 @@ function TripCard({ trip, onDelete }) {
             <div className="w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
-        
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase text-blue-600 tracking-wider z-10 shadow-sm">
-          {t('upcoming')}
+      
+        <div className={`absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider z-10 shadow-sm ${status.textColor}`}>
+          {status.label}
         </div>
       </div>
       

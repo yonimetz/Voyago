@@ -17,9 +17,11 @@ const resources = {
       "generating": "Generating your perfect trip...",
       "view_itinerary": "View Itinerary",
       "upcoming": "UPCOMING",
+      "completed": "COMPLETED",
+      "in_progress": "NOW",
       "wait_crafting": "Crafting your journey...",
       "wait_finding": "finding the perfect plan for you",
-
+      
       "community": "Community",
       "discover_communities": "Discover Communities",
       "community_desc": "Connect with fellow travelers, share itineraries, and plan together.",
@@ -46,6 +48,8 @@ const resources = {
       "generating": "מתכנן את טיול החלומות שלך...",
       "view_itinerary": "צפה במסלול",
       "upcoming": "בקרוב",
+      "completed":"הסתיים",
+      "in_progress":"עכשיו",
       "wait_crafting": "מתכנן עבורך את הטיול...",
       "wait_finding": "יוצר את התוכנית המושלמת בשבילך",
 
