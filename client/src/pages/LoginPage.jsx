@@ -67,7 +67,7 @@ function LoginPage({ setCurrentUser }) {
           {/* צד שמאל: טקסט שיווקי ואווירה */}
           <div className="hidden lg:block text-white">
             <h2 className="text-5xl lg:text-6xl font-extrabold mb-6 leading-tight drop-shadow-lg">
-              plan your Journey <br/> as you imagined
+              Plan Your Journey <br/> as you imagined
             </h2>
             <p className="text-xl text-slate-200 mb-8 max-w-lg font-medium drop-shadow-md">
               Every great journey begins with a vision. Let us seamlessly weave your desires into a breathtaking, tailor-made adventure designed exclusively for you.

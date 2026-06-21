@@ -2,10 +2,15 @@ package com.voyago.server.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,20 +23,31 @@ public class GeminiService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    @Autowired
+    @Lazy
+    private GeminiService self;
+
     public GeminiService() {
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
     }
 
-    // הפונקציה הראשית ליצירת טיול שלם
     public String generateTripPlan(String destination, String startDate, String endDate, String style, String aiPreferences, String language) {
         String targetLanguage = (language != null && language.equals("he")) ? "Hebrew" : "English";
 
-        String prompt = "Act as a professional travel planner. Generate a detailed trip itinerary for " + destination + 
-                        " from " + startDate + " to " + endDate + ". Trip style/preference: " + style + ". ";
+        String styleInstruction = style.equals("Recommended") 
+            ? "Provide a perfectly balanced mix of the top highlights (culture, nature, food, and leisure)." 
+            : "Create a well-rounded itinerary, but put a STRONG EMPHASIS on " + style + ". Include related activities throughout the trip while keeping the overall experience varied and realistic.";
+
+        String prompt = "Act as a professional travel planner. Generate a highly logical and realistic itinerary for '" + destination + 
+                        "' from " + startDate + " to " + endDate + ". " + styleInstruction + " ";
+                        
+        prompt += "CRITICAL GEOGRAPHIC LOGIC: Evaluate if '" + destination + "' is a single city, a large region, or a whole country. " +
+                  "If it is a large region or country, you MUST structure the itinerary realistically. Group days by logical 'base cities' to minimize driving. " +
+                  "Do not create itineraries that require impossible daily driving distances. If changing regions, make the first stop of that day a transit note (e.g., 'Travel from X to Y'). ";
                         
         if (aiPreferences != null && !aiPreferences.trim().isEmpty()) {
-            prompt += "CRITICAL USER PREFERENCES: " + aiPreferences + ". You MUST adhere to these rules strictly when planning the itinerary. ";
+            prompt += "CRITICAL USER PREFERENCES: " + aiPreferences + ". You MUST adhere to these rules strictly. ";
         }
 
         prompt += "LANGUAGE INSTRUCTION: You must write all the generated content (descriptions, stop names, destination name) in " + targetLanguage + ". " +
@@ -47,11 +63,9 @@ public class GeminiService {
                   "\"address\": \"string\", " +
                   "\"image_keyword\": \"Strictly English search term for this specific stop\" } ] } ] }";
 
-        // עכשיו פשוט קוראים לפונקציית העזר שלנו!
-        return callGeminiApi(prompt);
+        return self.callGeminiApiWithRetry(prompt, "gemini-3.5-flash");
     }
 
-    // הפונקציה החדשה להחלפת תחנה בודדת
     public String generateAlternativeStop(String destination, String currentStopName, String currentStopDesc, String userPrompt) {
         String reason = (userPrompt != null && !userPrompt.trim().isEmpty()) 
                 ? userPrompt 
@@ -68,12 +82,31 @@ public class GeminiService {
             destination, currentStopName, currentStopDesc, reason
         );
 
-        return callGeminiApi(prompt); 
+        return self.callGeminiApiWithRetry(prompt, "gemini-3.5-flash"); 
     }
 
-    // --- פונקציית העזר הפרטית שמדברת בפועל עם השרתים של גוגל ---
-    private String callGeminiApi(String prompt) {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + apiKey;
+    @Retryable(
+        retryFor = {RuntimeException.class},
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
+    public String callGeminiApiWithRetry(String prompt, String model) {
+        System.out.println("Calling Gemini API with model: " + model + "...");
+        return executeHttpRequest(prompt, model);
+    }
+
+    @Recover
+    public String fallbackCallGeminiApi(RuntimeException e, String prompt, String model) {
+        System.err.println("Primary model (" + model + ") failed after 3 attempts. Error: " + e.getMessage());
+        
+        String fallbackModel = "gemini-2.5-flash"; 
+        System.out.println("Switching to fallback model: " + fallbackModel + "...");
+        
+        return executeHttpRequest(prompt, fallbackModel);
+    }
+
+    private String executeHttpRequest(String prompt, String model) {
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + apiKey;
         
         String safePrompt = prompt.replace("\"", "\\\"").replace("\n", " ");
         String requestBody = "{\n" +
@@ -100,7 +133,7 @@ public class GeminiService {
             return extractedJson.replace("```json", "").replace("```", "").trim();
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to communicate with Gemini API: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

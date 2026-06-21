@@ -68,10 +68,10 @@ function RegisterPage({ setCurrentUser }) {
           {/* צד שמאל: טקסט שיווקי ואווירה */}
           <div className="hidden lg:block text-white">
             <h2 className="text-5xl lg:text-6xl font-extrabold mb-6 leading-tight drop-shadow-lg">
-              Unlock Your Next <br/> Premium Journey
+              Plan Your Journey <br/> as you imagined
             </h2>
             <p className="text-xl text-slate-200 mb-8 max-w-lg font-medium drop-shadow-md">
-              Join Voyago today. Let our intelligent engine design seamless, personalized journeys that bring your ultimate travel fantasies to life.
+              Every great journey begins with a vision. Let us seamlessly weave your desires into a breathtaking, tailor-made adventure designed exclusively for you.
             </p>
           </div>
 
