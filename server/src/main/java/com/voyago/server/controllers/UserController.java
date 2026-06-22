@@ -1,9 +1,12 @@
 package com.voyago.server.controllers;
 
+import com.voyago.server.dto.PasswordUpdateDTO;
+import com.voyago.server.dto.UserUpdateDTO;
 import com.voyago.server.models.User;
 import com.voyago.server.repositories.UserRepository;
 import com.voyago.server.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,25 +36,56 @@ public class UserController {
         return userService.saveUser(user);
     }
 
-    @DeleteMapping("/{id}")
-public void deleteUser(@PathVariable Long id) {
-    userService.deleteUser(id);
-}
-@PutMapping("/{id}/preferences")
-    public ResponseEntity<?> updatePreferences(@PathVariable Long id, @RequestBody Map<String, String> request) {
+    @PutMapping("/{id}/preferences")
+        public ResponseEntity<?> updatePreferences(@PathVariable Long id, @RequestBody Map<String, String> request) {
+            try {
+                // חיפוש המשתמש במסד הנתונים
+                User user = userRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+
+                // עדכון השדה החדש ושמירה
+                user.setAiPreferences(request.get("aiPreferences"));
+                User updatedUser = userRepository.save(user);
+
+                return ResponseEntity.ok(updatedUser);
+                
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("{\"error\": \"Failed to update preferences\"}");
+            }
+        }
+    // 1. עדכון פרופיל מלא
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUserProfile(@PathVariable Long id, @RequestBody UserUpdateDTO request) {
         try {
-            // חיפוש המשתמש במסד הנתונים
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
-            // עדכון השדה החדש ושמירה
-            user.setAiPreferences(request.get("aiPreferences"));
-            User updatedUser = userRepository.save(user);
-
+            User updatedUser = userService.updateUser(id, request);
             return ResponseEntity.ok(updatedUser);
-            
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("{\"error\": \"Failed to update preferences\"}");
+            return ResponseEntity.badRequest().body("Error updating user: " + e.getMessage());
+        }
+    }
+
+    // 2. עדכון סיסמה
+    @PutMapping("/{id}/password")
+    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody PasswordUpdateDTO request) {
+        try {
+            userService.updatePassword(id, request.getOldPassword(), request.getNewPassword());
+            return ResponseEntity.ok().body("{\"message\": \"Password updated successfully\"}");
+        } catch (IllegalArgumentException e) {
+            // סיסמה ישנה שגויה
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"Invalid old password\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("{\"error\": \"Error updating password\"}");
+        }
+    }
+
+    // 3. מחיקת חשבון
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok().body("{\"message\": \"Account deleted successfully\"}");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("{\"error\": \"Error deleting account\"}");
         }
     }
 }

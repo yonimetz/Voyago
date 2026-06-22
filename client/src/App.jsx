@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard';
 import TripView from './pages/TripView';
 import Profile from './pages/Profile';
 import Community from './pages/Community';
+import About from './pages/About';
+import Terms from './pages/Terms';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 
@@ -34,17 +36,18 @@ function App() {
         element={<RegisterPage setCurrentUser={setCurrentUser} />} 
       />
       
-      {/* דף הבית (דשבורד) */}
       {/* אם המשתמש מחובר - מציגים דשבורד. אם לא - מעבירים אותו אוטומטית ללוגין */}
       <Route path="/" element={ currentUser ? 
           <Dashboard currentUser={currentUser} setCurrentUser={setCurrentUser} /> : 
           <Navigate to="/login" />} />
-      {/* נתיב ברירת מחדל לכל כתובת לא מוכרת - חזרה ללוגין */}
+      {/* נתיב ברירת מחדל - חזרה ללוגין */}
       <Route path="*" element={<Navigate to="/login" />} />
 
       <Route path="/trip/:tripId" element={<TripView />} />
       <Route path="/profile" element={currentUser ? <Profile currentUser={currentUser} setCurrentUser={setCurrentUser} /> : <Navigate to="/login" />} />
       <Route path="/community" element={<Community />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/terms" element={<Terms />} />
     </Routes>
   );
 }

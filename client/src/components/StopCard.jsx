@@ -269,9 +269,16 @@ function StopCard({ stop, stopIndex, trip }) {
               </div>
               
               {currentStop.address && (
-                <p className="text-slate-500 text-sm font-medium mb-3 flex items-center gap-1.5 print:text-slate-600">
-                  <MapPin className="w-4 h-4 text-blue-500 print:text-slate-400" /> {currentStop.address}
-                </p>
+                <a 
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(currentStop.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-slate-500 text-sm font-medium mb-3 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 -ms-2 rounded-lg transition-colors group/map cursor-pointer print:text-slate-600 print:hover:bg-transparent print:p-0 print:ms-0"
+                  title="Open in Google Maps"
+                >
+                  <MapPin className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform print:text-slate-400" /> 
+                  {currentStop.address}
+                </a>
               )}
               
               <p className="text-slate-600 leading-relaxed text-sm mb-4 print:text-black">
