@@ -14,7 +14,6 @@ function LoginPage({ setCurrentUser }) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'he';
 
-  // חלון קופץ
   const [modalState, setModalState] = useState({ isOpen: false, type: 'support' });
 
   const toggleLanguage = () => {
@@ -240,45 +239,49 @@ function LoginPage({ setCurrentUser }) {
         <p className="text-slate-500 text-sm font-medium">{t('footer_rights', '© 2026 Voyago. All rights reserved.')}</p>
       </footer>
 
-      {/* --- מודל משותף ליצירת קשר ותמיכה --- */}
-      {modalState.isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          {/* רקע כהה לסגירה בלחיצה */}
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeModal}></div>
-          
-          {/* תוכן המודל */}
-          <div className="relative bg-white rounded-[2.5rem] p-8 md:p-12 max-w-md w-full shadow-2xl animate-fade-in text-center">
-            <button 
-              onClick={closeModal} 
-              className="absolute top-6 end-6 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full p-2 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            
-            <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
-               {modalState.type === 'support' ? <MessageCircle className="w-10 h-10"/> : <Mail className="w-10 h-10"/>}
-            </div>
-            
-            <h3 className="text-3xl font-black text-slate-800 mb-4">
-               {modalState.type === 'support' ? t('support_modal_title', 'How can we help?') : t('contact_modal_title', 'Get in Touch')}
-            </h3>
-            
-            <p className="text-slate-500 mb-8 leading-relaxed font-medium">
-               {modalState.type === 'support' 
-                  ? t('support_modal_desc', 'Our support team is available 24/7. Send us an email and we will get back to you shortly.') 
-                  : t('contact_modal_desc', 'We would love to hear from you! Reach out for partnerships, press, or general inquiries.')}
-            </p>
-            
-            <a 
-              href="mailto:support@voyago.com" 
-              className="inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-200 transform active:scale-95"
-            >
-              {t('modal_contact_btn', 'Email Us')}
-            </a>
-          </div>
-        </div>
-      )}
-      
+      {/* מודל ליצירת קשר */}
+            {modalState.isOpen && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeModal}></div>
+                <div className="relative bg-white rounded-[2.5rem] p-8 md:p-12 max-w-md w-full shadow-2xl animate-fade-in text-center">
+                  <button 
+                    onClick={closeModal} 
+                    className="absolute top-6 end-6 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full p-2 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  
+                  <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
+                    <Mail className="w-10 h-10"/>
+                  </div>
+                  
+                  <h3 className="text-3xl font-black text-slate-800 mb-4">
+                    {t('contact_modal_title', 'Get in Touch')}
+                  </h3>
+                  
+                  <p className="text-slate-500 mb-8 leading-relaxed font-medium whitespace-pre-line">
+                    {t('contact_modal_desc')}
+                  </p>
+                  
+                  <div className="flex flex-col gap-3">
+                    <a 
+                      href="mailto:voyagoAI@gmail.com" 
+                      className="inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-200 transform active:scale-95"
+                    >
+                      {t('modal_contact_btn', 'Email Us')}
+                    </a>
+                    <a 
+                      href="https://wa.me/972507522303" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-green-200 transform active:scale-95"
+                    >
+                      {t('modal_whatsapp_btn', 'Chat on WhatsApp')}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
     </div>
   );
 }
