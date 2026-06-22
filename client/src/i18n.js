@@ -4,6 +4,62 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     translation: {
+      "register_welcome": "Join the adventure! Create an account.",
+      "register_email": "Email",
+      "register_btn": "Create Account",
+      "register_connecting": "Creating Account...",
+      "register_error": "Registration failed. Username or email might be taken.",
+      "register_has_account": "Already have an account?",
+      "register_login": "Login here",
+      "nav_about": "About Us",
+      "nav_blog": "Blog",
+      "nav_support": "Support",
+      "nav_contact": "Contact",
+      "nav_terms": "Terms & Privacy",
+
+      "hero_title": "Plan Your Journey as you imagined",
+      "hero_subtitle": "Every great journey begins with a vision. Let us seamlessly weave your desires into a breathtaking, tailor-made adventure designed exclusively for you.",
+
+      "login_welcome": "Welcome back! Please login.",
+      "login_username": "Username",
+      "login_password": "Password",
+      "login_btn": "Login",
+      "login_connecting": "Connecting...",
+      "login_error": "Invalid username or password",
+      "login_no_account": "Don't have an account?",
+      "login_signup": "Sign Up",
+
+      "discover_more": "Discover More",
+
+      "feat_ai_title": "AI-Powered Planning",
+      "feat_ai_desc": "Generate personalized itineraries in seconds based on your specific travel style and preferences.",
+      "feat_routes_title": "Interactive Routes",
+      "feat_routes_desc": "Visualize your daily schedule with real-world imagery and precise location mapping.",
+      "feat_collab_title": "Collaborative Travel",
+      "feat_collab_desc": "Share your plans with travel partners and manage your upcoming adventures together.",
+
+      "trending_title": "Trending Destinations",
+      "trending_subtitle": "Discover popular routes created by the Voyago community.",
+
+      "tag_culture": "Culture",
+      "tag_romantic": "Romantic",
+      "tag_urban": "Urban Energy",
+
+      "dest_kyoto": "Kyoto, Japan",
+      "desc_kyoto": "Ancient temples, gardens, and rich traditions.",
+      "dest_paris": "Paris, France",
+      "desc_paris": "Art, history, and iconic architecture.",
+      "dest_nyc": "New York City",
+      "desc_nyc": "Skyscrapers, Broadway, and endless possibilities.",
+
+      "footer_rights": "© 2026 Voyago. All rights reserved.",
+
+      "support_modal_title": "How can we help?",
+      "contact_modal_title": "Get in Touch",
+      "support_modal_desc": "Our support team is available 24/7. Send us an email and we will get back to you shortly.",
+      "contact_modal_desc": "We would love to hear from you! Reach out for partnerships, press, or general inquiries.",
+      "modal_contact_btn": "Email Us",
+
       "travel_management": "Travel Management",
       "account": "Account",
       "logged_in": "Logged In",
@@ -45,6 +101,62 @@ const resources = {
   },
   he: {
     translation: {
+      "register_welcome": "הצטרף להרפתקה! צור חשבון.",
+      "register_email": "אימייל",
+      "register_btn": "צור חשבון",
+      "register_connecting": "יוצר חשבון...",
+      "register_error": "ההרשמה נכשלה. ייתכן ששם המשתמש או האימייל כבר תפוסים.",
+      "register_has_account": "כבר יש לך חשבון?",
+      "register_login": "התחבר כאן",
+      "nav_about": "עלינו",
+      "nav_blog": "בלוג",
+      "nav_support": "תמיכה",
+      "nav_contact": "צור קשר",
+      "nav_terms": "תנאים ופרטיות",
+
+      "hero_title": "תכנן את המסע שלך בדיוק כפי שדמיינת",
+      "hero_subtitle": "כל מסע גדול מתחיל בחזון. תן לנו לשזור בצורה חלקה את הרצונות שלך להרפתקה עוצרת נשימה, המותאמת אישית רק עבורך.",
+
+      "login_welcome": "ברוך שובך! אנא התחבר.",
+      "login_username": "שם משתמש",
+      "login_password": "סיסמה",
+      "login_btn": "התחברות",
+      "login_connecting": "מתחבר...",
+      "login_error": "שם משתמש או סיסמה שגויים",
+      "login_no_account": "אין לך חשבון?",
+      "login_signup": "הירשם עכשיו",
+
+      "discover_more": "גלה עוד",
+
+      "feat_ai_title": "תכנון מבוסס בינה מלאכותית",
+      "feat_ai_desc": "צור מסלולים מותאמים אישית בשניות, מבוססים על סגנון הטיול וההעדפות שלך.",
+      "feat_routes_title": "מסלולים אינטראקטיביים",
+      "feat_routes_desc": "הצג את הלו\"ז היומי שלך עם תמונות אמיתיות ומיפוי מיקומים מדויק.",
+      "feat_collab_title": "טיול משותף",
+      "feat_collab_desc": "שתף את התוכניות שלך עם שותפים לטיול ונהלו את ההרפתקאות הבאות שלכם יחד.",
+
+      "trending_title": "יעדים מובילים",
+      "trending_subtitle": "גלה מסלולים פופולריים שנוצרו על ידי קהילת Voyago.",
+
+      "tag_culture": "תרבות",
+      "tag_romantic": "רומנטיקה",
+      "tag_urban": "אנרגיה אורבנית",
+
+      "dest_kyoto": "קיוטו, יפן",
+      "desc_kyoto": "מקדשים עתיקים, גנים ומסורות עשירות.",
+      "dest_paris": "פריז, צרפת",
+      "desc_paris": "אמנות, היסטוריה וארכיטקטורה אייקונית.",
+      "dest_nyc": "ניו יורק",
+      "desc_nyc": "גורדי שחקים, ברודווי ואפשרויות אינסופיות.",
+
+      "footer_rights": "© 2026 Voyago. כל הזכויות שמורות.",
+
+      "support_modal_title": "איך אפשר לעזור?",
+      "contact_modal_title": "צור קשר",
+      "support_modal_desc": "צוות התמיכה שלנו זמין 24/7. שלח לנו אימייל ונחזור אליך בהקדם.",
+      "contact_modal_desc": "נשמח לשמוע ממך! פנה אלינו לשיתופי פעולה, עיתונות או שאלות כלליות.",
+      "modal_contact_btn": "שלח אימייל",
+
       "travel_management": "מתכנן נסיעות",
       "account": "חשבון",
       "logged_in": "מחובר",
