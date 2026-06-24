@@ -15,7 +15,6 @@ function RegisterPage({ setCurrentUser }) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'he';
 
-  // ניהול המודל (חלון קופץ)
   const [modalState, setModalState] = useState({ isOpen: false });
 
   const toggleLanguage = () => {
@@ -57,32 +56,29 @@ function RegisterPage({ setCurrentUser }) {
   return (
     <div className="min-h-screen font-sans text-slate-900 bg-white overflow-x-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
       
-      {/* תפריט עליון (Header)  */}
+      {/* תפריט עליון */}
       <header className="absolute top-0 w-full z-50 p-6 lg:px-12 flex justify-between items-center">
         <h1 className="text-3xl font-extrabold text-white tracking-tight drop-shadow-md">
           Voyago<span className="text-blue-500">.</span>
         </h1>
         
-        {/* קישורי תפריט נקיים ואחידים */}
-        <nav className="hidden md:flex items-center gap-8 text-white font-medium text-sm drop-shadow-md">
-          <Link to="/about" className="hover:text-blue-300 transition-colors">{t('nav_about', 'About Us')}</Link>
-          <button onClick={openModal} className="hover:text-blue-300 transition-colors">{t('nav_contact', 'Contact Us')}</button>
-          <Link to="/terms" className="hover:text-blue-300 transition-colors">{t('nav_terms', 'Terms & Privacy')}</Link>
+        <nav className="hidden md:flex items-center gap-8 text-white font-medium text-sm drop-shadow-md tracking-wide">
+          <Link to="/about" className="hover:text-[#0770E8] transition-colors">{t('nav_about', 'About Us')}</Link>
+          <button onClick={() => openModal('contact')} className="hover:text-[#0770E8] transition-colors">{t('nav_contact', 'Contact')}</button>
+          <Link to="/terms" className="hover:text-[#0770E8] transition-colors">{t('nav_terms', 'Terms & Privacy')}</Link>
         </nav>
 
-        {/* כפתור החלפת שפה */}
         <button 
           onClick={toggleLanguage}
-          className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full transition-all text-white text-sm font-bold border border-white/10 shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl transition-all text-white text-xs font-bold uppercase tracking-wider border border-white/10 shadow-sm"
         >
           <Globe className="w-4 h-4" />
           {isRTL ? 'English' : 'עברית'}
         </button>
       </header>
 
-      {/* 1. HERO SECTION (מסך מלא עם וידאו) */}
+      {/* HERO SECTION */}
       <header className="relative w-full h-screen flex items-center justify-center">
-        {/* סרטון רקע */}
         <video 
           autoPlay 
           loop 
@@ -93,13 +89,13 @@ function RegisterPage({ setCurrentUser }) {
           <source src="/hero-video.mp4" type="video/mp4" />
         </video>
         
-        {/* שכבת הכהיה כדי שהטופס יבלוט (Overlay) */}
+        {/* שכבת הכהיה כדי שהטופס יבלוט */}
         <div className={`absolute inset-0 bg-gradient-to-r ${isRTL ? 'from-transparent via-black/40 to-black/80' : 'from-black/80 via-black/40 to-transparent'}`}></div>
 
-        {/* תוכן ה-Hero מחולק ל-2 עמודות במסכים גדולים */}
+        {/* תוכן ה-Hero */}
         <div className="relative z-10 max-w-7xl w-full mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
-          {/* צד: טקסט שיווקי ואווירה */}
+          {/* צד: טקסט אווירה */}
           <div className="hidden lg:block text-white">
             <h2 className="text-5xl lg:text-6xl font-extrabold mb-6 leading-tight drop-shadow-lg max-w-2xl">
                {t('hero_title', 'Plan Your Journey as you imagined')}
@@ -109,8 +105,8 @@ function RegisterPage({ setCurrentUser }) {
             </p>
           </div>
 
-          {/* צד: כרטיס זכוכית (Glassmorphism) להרשמה */}
-          <div className="w-full max-w-md mx-auto bg-white/10 backdrop-blur-md p-10 rounded-[2.5rem] shadow-2xl border border-white/20">
+          {/* צד: כרטיס זכוכית */}
+          <div className="w-full max-w-md mx-auto bg-white/5 backdrop-blur-sm p-10 rounded-[2.5rem] shadow-2xl border border-white/20">
             <div className="text-center mb-8">
               <h2 className="text-4xl font-black text-white mb-2 drop-shadow-md">Voyago</h2>
               <p className="text-white/80 font-medium">{t('register_welcome', 'Join the adventure! Create an account.')}</p>
@@ -166,7 +162,7 @@ function RegisterPage({ setCurrentUser }) {
           </div>
         </div>
 
-        {/* אינדיקטור גלילה למטה */}
+        {/* גלילה למטה */}
         <div 
           onClick={scrollToContent}
           className="absolute z-50 bottom-8 left-1/2 transform -translate-x-1/2 text-white flex flex-col items-center animate-bounce cursor-pointer opacity-80 hover:opacity-100 transition-opacity"
@@ -176,9 +172,8 @@ function RegisterPage({ setCurrentUser }) {
         </div>
       </header>
 
-      {/* 2. תוכן שיווקי בגלילה (CONTENT & EXPLORATION) */}
+      {/* תוכן שיווקי */}
       
-      {/* אזור פיצ'רים מינימליסטי */}
       <section className="py-24 bg-slate-50 border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
@@ -207,16 +202,16 @@ function RegisterPage({ setCurrentUser }) {
         </div>
       </section>
 
-      {/* אזור יעדים נבחרים (גריד כרטיסיות) */}
+      {/* תצוגת כרטיסיות*/}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold text-slate-900 mb-4">{t('trending_title', 'Trending Destinations')}</h2>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">{t('trending_title', 'Trending Destinations')}</h2>
             <p className="text-lg text-slate-500">{t('trending_subtitle', 'Discover popular routes created by the Voyago community.')}</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* כרטיס 1: קיוטו, יפן */}
+
             <div className="group relative h-[400px] rounded-3xl overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-500">
               <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Kyoto" className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
@@ -227,7 +222,6 @@ function RegisterPage({ setCurrentUser }) {
               </div>
             </div>
 
-            {/* כרטיס 2: פריז, צרפת */}
             <div className="group relative h-[400px] rounded-3xl overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-500">
               <img src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Paris" className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
@@ -238,7 +232,6 @@ function RegisterPage({ setCurrentUser }) {
               </div>
             </div>
 
-            {/* כרטיס 3: ניו יורק, ארה"ב */}
             <div className="group relative h-[400px] rounded-3xl overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-500">
               <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="New York" className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
@@ -256,34 +249,34 @@ function RegisterPage({ setCurrentUser }) {
         <p className="text-slate-500 text-sm font-medium">{t('footer_rights', '© 2026 Voyago. All rights reserved.')}</p>
       </footer>
 
-      {/* מודל ליצירת קשר */}
-      {modalState.isOpen && (
+      {/* יצירת קשר */}
+        {modalState.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeModal}></div>
           <div className="relative bg-white rounded-[2.5rem] p-8 md:p-12 max-w-md w-full shadow-2xl animate-fade-in text-center">
             <button 
               onClick={closeModal} 
-              className="absolute top-6 end-6 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full p-2 transition-colors"
+              className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'} text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full p-2 transition-colors`}
             >
               <X className="w-5 h-5" />
             </button>
             
-            <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <div className="w-20 h-20 bg-blue-50 text-[#0770E8] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
               <Mail className="w-10 h-10"/>
             </div>
             
-            <h3 className="text-3xl font-black text-slate-800 mb-4">
+            <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">
               {t('contact_modal_title', 'Get in Touch')}
             </h3>
             
-            <p className="text-slate-500 mb-8 leading-relaxed font-medium whitespace-pre-line">
+            <p className="text-slate-500 mb-8 leading-relaxed font-medium text-sm whitespace-pre-line">
               {t('contact_modal_desc')}
             </p>
             
             <div className="flex flex-col gap-3">
               <a 
                 href="mailto:voyagoAI@gmail.com" 
-                className="inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-200 transform active:scale-95"
+                className="inline-flex items-center justify-center w-full bg-[#0770E8] hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-md shadow-[#0770E8]/20 transform active:scale-95 text-sm tracking-wide"
               >
                 {t('modal_contact_btn', 'Email Us')}
               </a>
@@ -291,7 +284,7 @@ function RegisterPage({ setCurrentUser }) {
                 href="https://wa.me/972507522303" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-green-200 transform active:scale-95"
+                className="inline-flex items-center justify-center w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 rounded-2xl transition-all shadow-md shadow-green-200 transform active:scale-95 text-sm tracking-wide"
               >
                 {t('modal_whatsapp_btn', 'Chat on WhatsApp')}
               </a>

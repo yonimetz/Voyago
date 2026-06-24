@@ -32,6 +32,10 @@ public class GeminiService {
         this.objectMapper = new ObjectMapper();
     }
 
+    public String generateChatReply(String prompt) {
+        return self.callGeminiApiWithRetry(prompt, "gemini-2.5-flash-lite"); 
+    }
+
     public String generateTripPlan(String destination, String startDate, String endDate, String style, String aiPreferences, String language) {
         String targetLanguage = (language != null && language.equals("he")) ? "Hebrew" : "English";
 
