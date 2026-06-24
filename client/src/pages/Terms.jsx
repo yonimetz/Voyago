@@ -32,8 +32,8 @@ function Terms() {
       <main className="max-w-3xl mx-auto px-6 py-16">
         
         <header className="mb-16">
-          <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-            {isRTL ? 'תנאי שימוש ומדיניות פרטיות' : 'Terms of Service & Privacy Policy'}
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+            {isRTL ? 'תנאי שימוש ומדיניות פרטיות' : 'Terms Service & Privacy Policy'}
           </h1>
           <p className="text-slate-500 font-medium">
             {isRTL ? `עודכן לאחרונה: ${lastUpdated}` : `Last Updated: ${lastUpdated}`}
@@ -79,7 +79,7 @@ function Terms() {
             <ul className="list-disc list-inside ms-4 space-y-2 text-slate-500">
               <li>{isRTL ? 'איננו מוכרים את המידע שלך לצדדים שלישיים.' : 'We do not sell your personal data to third parties.'}</li>
               <li>{isRTL ? 'הסיסמאות נשמרות בצורה מוצפנת ומאובטחת.' : 'Passwords are encrypted and stored securely.'}</li>
-              <li>{isRTL ? 'מסמכים המועלים לאתר (כגון כרטיסי טיסה) נשמרים בשרת מאובטח ונגישים רק לך.' : 'Documents uploaded to the platform (e.g., tickets) are securely stored and accessible only by you.'}</li>
+              <li>{isRTL ? 'מסמכים המועלים לאתר (כגון כרטיסי טיסה) נשמרים בענן מאובטח ונגישים רק לך.' : 'Documents uploaded to the platform (e.g., tickets) are securely stored and accessible only by you.'}</li>
             </ul>
           </section>
 
