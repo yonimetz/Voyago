@@ -44,13 +44,13 @@ public class TripController {
     @PostMapping("/generate")
     public ResponseEntity<?> generateTripWithAI(@RequestBody TripGenerationRequest request) {
         try {
-            // 1. קודם שולפים את המשתמש ממסד הנתונים כדי לקבל את העדפות ה-AI שלו
+            // קודם שולפים את המשתמש ממסד הנתונים כדי לקבל העדפות ה-AI שלו
             User user = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             String preferences = user.getAiPreferences();
 
-            // 2. קריאה ל-AI וקבלת ה-JSON הנקי - עכשיו מעבירים גם את ה-preferences (הפרמטר ה-5)
+            // קריאה לAI וקבלת JSON
             String aiResponseJson = geminiService.generateTripPlan(
                     request.getDestination(), 
                     request.getStartDate(), 
@@ -63,7 +63,7 @@ public class TripController {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(aiResponseJson);
 
-            // 3. יצירת טיול חדש
+            // טיול חדש
             Trip trip = new Trip();
             trip.setDestination(rootNode.path("destination").asText());
             trip.setImageKeyword(rootNode.path("image_keyword").asText());
@@ -71,7 +71,7 @@ public class TripController {
             trip.setEndDate(LocalDate.parse(request.getEndDate()));
             trip.setUser(user);
 
-            // 4. פירוק ה-JSON לימים ותחנות
+            // פירוק ה-JSON לימים ותחנות
             JsonNode daysNode = rootNode.path("days");
             List<TripDay> tripDays = new ArrayList<>();
 
@@ -79,7 +79,7 @@ public class TripController {
                 TripDay tripDay = new TripDay();
                 tripDay.setDayNumber(dayNode.path("day_number").asInt());
                 tripDay.setDescription("Day " + tripDay.getDayNumber() + " - " + dayNode.path("date").asText());
-                tripDay.setTrip(trip); // קישור חזרה לטיול
+                tripDay.setTrip(trip); 
 
                 JsonNode stopsNode = dayNode.path("stops");
                 List<RouteStop> routeStops = new ArrayList<>();
@@ -90,7 +90,7 @@ public class TripController {
                     stop.setVisitTime(stopNode.path("visit_time").asText());
                     stop.setAddress(stopNode.path("address").asText());
                     stop.setImageKeyword(stopNode.path("image_keyword").asText());
-                    stop.setTripDay(tripDay); // קישור חזרה ליום
+                    stop.setTripDay(tripDay); 
 
                     routeStops.add(stop);
                 }
@@ -99,7 +99,7 @@ public class TripController {
             }
             trip.setDays(tripDays);
 
-            // 5. שמירה ב-DB! בזכות ה-Cascade, זה שומר גם את הימים והתחנות
+            // שמירה ב-DB! בזכות ה-Cascade, זה שומר גם את הימים והתחנות
             Trip savedTrip = tripService.saveTrip(trip);
 
             return ResponseEntity.ok(savedTrip);
@@ -125,7 +125,7 @@ public class TripController {
     public ResponseEntity<?> deleteTrip(@PathVariable Long id) {
         try {
             tripService.deleteTrip(id);
-            return ResponseEntity.ok().build(); // מחזיר סטטוס 200 (הצלחה) בלי תוכן
+            return ResponseEntity.ok().build(); 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("{\"error\": \"Failed to delete trip\"}");
