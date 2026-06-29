@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import toast, { Toaster } from 'react-hot-toast';
 import TripCard from '../components/TripCard';
 import AIdeaBotBubble from '../components/AIdeaBotBubble';
-import { Users, Map, Settings, Globe, LogOut, Sparkles, Loader2, Mountain, Landmark, Coffee, Smile, Wand2, Bot, MapPin, PlaneTakeoff, Plus } from 'lucide-react';
+import { Users, Map, Settings, Globe, LogOut, Sparkles, Loader2, Mountain, Landmark, Coffee, Smile, Wand2, Bot, MapPin, PlaneTakeoff, Plus, X } from 'lucide-react';
 
 function Dashboard({ currentUser, setCurrentUser }) {
   const [trips, setTrips] = useState([]);
@@ -253,15 +253,15 @@ function Dashboard({ currentUser, setCurrentUser }) {
           </ul>
 
           <div className="pt-6 mt-6 border-t border-slate-100 space-y-2">
-          <div className="flex items-center gap-4 px-4 py-3.5 bg-white border border-slate-200 rounded-2xl transition-all">
-            <div className="w-9 h-9 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
-              {currentUser?.username?.charAt(0).toUpperCase()}
+            <div className="flex items-center gap-4 px-4 py-3.5 bg-white border border-slate-200 rounded-2xl transition-all">
+              <div className="w-9 h-9 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
+                {currentUser?.username?.charAt(0).toUpperCase()}
+              </div>
+              <div className="overflow-hidden">
+                <p className="text-sm font-medium text-slate-500 truncate">{currentUser?.username}</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t('logged_in', 'Logged In')}</p>
+              </div>
             </div>
-            <div className="overflow-hidden">
-              <p className="text-sm font-medium text-slate-500 truncate">{currentUser?.username}</p>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t('logged_in', 'Logged In')}</p>
-            </div>
-          </div>
 
             <button 
               onClick={handleLogout}
@@ -415,9 +415,13 @@ function Dashboard({ currentUser, setCurrentUser }) {
               <div className="text-slate-200 flex justify-center mb-6">
                  <Map className="w-16 h-16 text-[#0770E8]/60 bg-blue-50/50 p-4 rounded-xl" />
               </div>
-              <h3 className="text-xl font-medium tracking-wide text-slate-800">{t('No trips planned yet')}</h3>
+              <h3 className="text-xl font-medium tracking-wide text-slate-800">
+                {isRTL ? 'אין טיולים מתוכננים' : t('No trips planned yet')}
+              </h3>
               <p className="text-sm text-slate-400 mt-2 max-w-sm mx-auto font-medium">
-                {t('Ready for a new adventure? Start by creating your first travel plan.')}
+                {isRTL 
+                  ? "מוכנים להרפתקה חדשה? התחילו ביצירת תוכנית הטיול הראשונה שלכם." 
+                  : "Ready for a new adventure? Start by creating your first travel plan."}
               </p>
               <button 
                 onClick={() => setShowCreateForm(true)}
@@ -428,20 +432,39 @@ function Dashboard({ currentUser, setCurrentUser }) {
           )}
         </div>
         
+        {/* מסך טעינה */}
         {isGenerating && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex flex-col items-center justify-center text-white transition-all">
-          <div className="w-12 h-10 border-2 border-[#0770E8] border-t-transparent rounded-full animate-spin mb-6"></div>
-          <h2 className="text-2xl font-light tracking-wide mb-1">{t('wait_crafting')}</h2>
-          <p className="text-slate-200 text-xs font-bold uppercase tracking-widest animate-pulse flex items-center gap-2 opacity-80">
-            {t('wait_finding')} <PlaneTakeoff className="w-4 h-4 text-[#0770E8]" />
-          </p>
-        </div>
-      )}
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex flex-col items-center justify-center text-white transition-all duration-300" dir={isRTL ? 'rtl' : 'ltr'}>
+            
+            {/* כפתור יציאה */}
+            <button 
+              onClick={() => setIsGenerating(false)}
+              className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'} text-white/60 hover:text-white bg-slate-800/40 hover:bg-slate-700/60 p-2.5 rounded-full transition-all duration-200 hover:scale-105 active:scale-95`}
+              title={isRTL ? 'בטל יצירת טיול' : 'Cancel trip generation'}
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="relative flex items-center justify-center mb-8">
+              <Loader2 className="w-20 h-20 text-[#0770E8] animate-spin" />
+              <PlaneTakeoff className="w-8 h-8 text-white absolute transform -rotate-12" />
+            </div>
+            <h2 className="text-3xl font-light tracking-wide mb-3 text-white drop-shadow-sm">
+              {t('wait_crafting')}
+            </h2>
+            <p className="text-slate-300 text-sm font-medium tracking-wide animate-pulse flex items-center gap-2 opacity-90">
+              {t('wait_finding')}
+            </p>
+          </div>
+        )}
       </main>
+
+      {!isGenerating && (
         <AIdeaBotBubble currentUser={currentUser} 
-        setShowCreateForm={setShowCreateForm} 
-        setDestination={setDestination} 
-      />
+          setShowCreateForm={setShowCreateForm} 
+          setDestination={setDestination} 
+        />
+      )}
     </div>
   );
 }
