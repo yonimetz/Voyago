@@ -95,16 +95,16 @@ function TripCard({ trip, onDelete }) {
       
       {/* פרטי הטיול */}
       <div className="p-6 flex-1 flex flex-col">
-        <h3 className="text-2xl font-bold text-slate-800 group-hover:text-[#0770E8] transition-colors capitalize flex items-center gap-2">
+        <h3 className="text-2xl font-bold text-slate-800 group-hover:text-[#0770E8] transition-colors capitalize flex items-center gap-2 transform-gpu">
           {trip.destination}
         </h3>
         
-        <div className="mt-3 mb-6 flex items-center text-slate-500 text-sm font-medium">
+        <div className="mt-3 mb-6 flex items-center text-slate-500 text-sm font-medium transform-gpu">
           <Calendar className="w-4 h-4 me-2 text-slate-400" />
           {trip.startDate} <span className="mx-1.5 opacity-50">—</span> {trip.endDate}
         </div>
         
-        <div className="mt-auto w-full bg-slate-50 text-center text-slate-600 font-bold py-3.5 rounded-2xl group-hover:bg-[#0770E8] group-hover:text-white transition-all duration-300 border border-slate-100 flex items-center justify-center gap-2 group-hover:shadow-md group-hover:shadow-blue-200">
+        <div className="mt-auto w-full bg-slate-50 text-center text-slate-600 font-bold py-3.5 rounded-2xl group-hover:bg-[#0770E8] group-hover:text-white transition-all duration-300 border border-slate-100 flex items-center justify-center gap-2 group-hover:shadow-md group-hover:shadow-blue-200 transform-gpu">
           <Map className="w-4 h-4" /> {t('view_itinerary', 'View Itinerary')}
         </div>
       </div>
